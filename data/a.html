@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Website</title>
+    <style>
+        /* Chatbox button styling */
+        .chatbox-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Chatbox container */
+        .chatbox-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 400px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+        }
+
+        /* Header for chatbox */
+        .chatbox-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        /* Chat messages container */
+        .messages {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* User and bot message styling */
+        .user-message, .bot-message {
+            margin-bottom: 10px;
+        }
+
+        .user-message {
+            text-align: right;
+            color: #007bff;
+        }
+
+        .bot-message {
+            text-align: left;
+            color: #333;
+        }
+
+        /* Input box */
+        .chatbox-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .chatbox-input input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+
+        .chatbox-input button {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Chatbox button -->
+<button class="chatbox-button" onclick="toggleChatbox()">💬</button>
+
+<!-- Chatbox container -->
+<div class="chatbox-container" id="chatbox-container">
+    <div class="chatbox-header">Chat with the Bot</div>
+    <div id="messages" class="messages"></div>
+    <div class="chatbox-input">
+        <input type="text" id="user-query" placeholder="Ask a question..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    // Toggle chatbox visibility
+    function toggleChatbox() {
+        const chatbox = document.getElementById('chatbox-container');
+        chatbox.style.display = chatbox.style.display === 'none' || chatbox.style.display === '' ? 'flex' : 'none';
+    }
+
+    // Send message to the bot
+    async function sendMessage() {
+        const query = document.getElementById('user-query').value;
+        if (!query) return;
+
+        // Display the user message in the chat
+        const messagesDiv = document.getElementById('messages');
+        const userMessage = document.createElement('div');
+        userMessage.classList.add('user-message');
+        userMessage.textContent = `You: ${query}`;
+        messagesDiv.appendChild(userMessage);
+        document.getElementById('user-query').value = '';
+
+        // Make a POST request to the Flask API
+        try {
+            const response = await fetch('http://127.0.0.1:5000/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: query })
+            });
+
+            const data = await response.json();
+            const botMessage = document.createElement('div');
+            botMessage.classList.add('bot-message');
+            botMessage.textContent = `Chatbot: ${data.response}`;
+            messagesDiv.appendChild(botMessage);
+        } catch (error) {
+            console.error('Error:', error);
+            const errorMessage = document.createElement('div');
+            errorMessage.classList.add('bot-message');
+            errorMessage.textContent = 'Chatbot: Sorry, I encountered an error. Please try again.';
+            messagesDiv.appendChild(errorMessage);
+        }
+
+        // Scroll to the bottom of the messages div
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Allow sending message with Enter key
+    document.getElementById('user-query').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+
+</body>
+</html>
