@@ -79,7 +79,7 @@ This project is licensed under the **MIT License**.
 
 ---
 ## 📬 Contact
-📧 **Email:** your.email@example.com  
+📧 **Email:** kartikeyanainkhwal@gmail.com  
 🐱 **GitHub:** [Your GitHub](https://github.com/KartikeyaNainkhwal)  
 🔗 **LinkedIn:** [Your LinkedIn](https://www.linkedin.com/in/kartikeya-nainkhwal-6493402b0/)  
 
